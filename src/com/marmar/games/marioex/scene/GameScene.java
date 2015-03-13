@@ -2,12 +2,17 @@ package com.marmar.games.marioex.scene;
 
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.engine.handler.physics.PhysicsHandler;
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
+import org.andengine.entity.modifier.LoopEntityModifier;
 import org.andengine.entity.modifier.MoveModifier;
+import org.andengine.entity.modifier.ScaleModifier;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.extension.physics.box2d.PhysicsConnector;
 import org.andengine.extension.physics.box2d.PhysicsFactory;
 import org.andengine.extension.physics.box2d.PhysicsWorld;
 import org.andengine.extension.tmx.TMXLayer;
@@ -19,14 +24,11 @@ import org.andengine.extension.tmx.TMXProperties;
 import org.andengine.extension.tmx.TMXTile;
 import org.andengine.extension.tmx.TMXTileProperty;
 import org.andengine.extension.tmx.TMXTiledMap;
-import org.andengine.extension.tmx.util.exception.TMXLoadException;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.ui.activity.BaseGameActivity;
 import org.andengine.util.Constants;
 import org.andengine.util.debug.Debug;
-
-import android.util.Log;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -86,12 +88,15 @@ public class GameScene extends BaseScene {
 
 			// this.mTMXTiledMap = tmxLoader.loadFromAsset("worlds/world" + j +
 			// ".tmx");
-			this.mTMXTiledMap = tmxLoader.loadFromAsset("worlds/MarioTest.tmx");
+			// miTest
+			this.mTMXTiledMap = tmxLoader.loadFromAsset("worlds/test5.tmx");
 
 		} catch (Exception e) {
 			System.out.println("Error!!!: " + e);
 			Debug.e(e);
 		}
+		
+		final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(0, 0.01f, 0.5f);
 
 		for (int i = 0; i < this.mTMXTiledMap.getTMXLayers().size(); i++) {
 			TMXLayer layer = this.mTMXTiledMap.getTMXLayers().get(i);
@@ -159,11 +164,71 @@ public class GameScene extends BaseScene {
 					rect2.registerUpdateHandler(physicsHandler2);
 
 					attachChild(rect2);
+				}else if (group.getName().equals("platform1")) {
+					
+					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.platform1_region, vbom);
+					PhysicsFactory.createBoxBody(physicsWorld, levelObject, BodyType.StaticBody, FIXTURE_DEF).setUserData("platform1");
+					attachChild(levelObject);
+				}else if (group.getName().equals("platform2")) {
+					
+					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.platform2_region, vbom);
+					final Body body = PhysicsFactory.createBoxBody(physicsWorld, levelObject, BodyType.StaticBody, FIXTURE_DEF);
+					body.setUserData("platform2");
+					physicsWorld.registerPhysicsConnector(new PhysicsConnector(levelObject, body, true, false));
+					attachChild(levelObject);
+				}else if (group.getName().equals("platform3")) {
+					
+					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.platform3_region, vbom);
+					final Body body = PhysicsFactory.createBoxBody(physicsWorld, levelObject, BodyType.StaticBody, FIXTURE_DEF);
+					body.setUserData("platform3");
+					physicsWorld.registerPhysicsConnector(new PhysicsConnector(levelObject, body, true, false));
+					attachChild(levelObject);
+				}else if (group.getName().equals("coin")) {
+					
+					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.coin_region, vbom)
+					{
+						@Override
+						protected void onManagedUpdate(float pSecondsElapsed) 
+						{
+							super.onManagedUpdate(pSecondsElapsed);
+
+							if (player.collidesWith(this))
+							{
+//								addToScore(10);
+//								TODO
+								this.setVisible(false);
+								this.setIgnoreUpdate(true);
+							}
+						}
+					};
+					levelObject.registerEntityModifier(new LoopEntityModifier(new ScaleModifier(1, 1, 1.3f)));
+					attachChild(levelObject);
+				}else if (group.getName().equals("platform3")) {
+					
+					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.complete_stars_region, vbom)
+					{
+						@Override
+						protected void onManagedUpdate(float pSecondsElapsed) 
+						{
+							super.onManagedUpdate(pSecondsElapsed);
+
+							if (player.collidesWith(this))
+							{
+//								levelCompleteWindow.display(StarsCount.TWO, GameScene.this, camera);
+//								TODO
+								this.setVisible(false);
+								this.setIgnoreUpdate(true);
+							}
+						}
+					};
+					levelObject.registerEntityModifier(new LoopEntityModifier(new ScaleModifier(1, 1, 1.3f)));
+					attachChild(levelObject);
 				}
+				
 			}
 		}
 
-		player = new Player(200, 400, vbom, camera, physicsWorld) {
+		player = new Player(200, 200, vbom, camera, physicsWorld) {//200 400
 			@Override
 			public void onDie() {
 
@@ -357,6 +422,28 @@ public class GameScene extends BaseScene {
 				final Fixture x1 = contact.getFixtureA();
 				final Fixture x2 = contact.getFixtureB();
 
+				if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
+				{
+					
+					if (x1.getBody().getUserData().equals("platform2") && x2.getBody().getUserData().equals("playerFeet"))
+					{
+						engine.registerUpdateHandler(new TimerHandler(0.2f, new ITimerCallback()
+						{									
+						    public void onTimePassed(final TimerHandler pTimerHandler)
+						    {
+						    	pTimerHandler.reset();
+						    	engine.unregisterUpdateHandler(pTimerHandler);
+						    	x1.getBody().setType(BodyType.DynamicBody);
+						    }
+						}));
+					}
+					
+					if (x1.getBody().getUserData().equals("platform3") && x2.getBody().getUserData().equals("playerFeet"))
+					{
+						x1.getBody().setType(BodyType.DynamicBody);
+					}
+				}
+				
 				if (x2.getUserData() != null) {
 
 					if (x2.getUserData().toString() == "playerFeet") {

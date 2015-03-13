@@ -86,12 +86,13 @@ public class MainMenuScene extends BaseScene implements
 				new SpriteMenuItem(MENU_PLAY, resourcesManager.play_region,
 						vbom), 1.2f, 1);
 
+//		menuChildScene.setPosition(0, 0);
 		menuChildScene.addMenuItem(playMenuItem);
 
 		menuChildScene.buildAnimations();
 		menuChildScene.setBackgroundEnabled(false);
 
-		playMenuItem.setPosition(playMenuItem.getX(), playMenuItem.getY() + 10);
+		playMenuItem.setPosition(playMenuItem.getX()-90, playMenuItem.getY());
 
 		menuChildScene.setOnMenuItemClickListener(this);
 

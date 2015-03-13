@@ -44,15 +44,39 @@ public abstract class Player extends AnimatedSprite {
 						GameConstants.MASKBITS_PLAYER, (short) 0));
 
 		body.setUserData("player");
+//		body.setUserData("playerFeet");
 		body.setFixedRotation(true);
 
 		final PhysicsHandler physicsHandler = new PhysicsHandler(this);
 		this.registerUpdateHandler(physicsHandler);
 
+//		final PolygonShape mPoly2 = new PolygonShape();
+//		mPoly2.setAsBox(8f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+//				15f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT, new Vector2(
+//						0, -.09f), 0);
+//		final FixtureDef pFixtureDef2 = PhysicsFactory.createFixtureDef(0f, 0f,
+//				0f, true, GameConstants.CATEGORYBIT_PLAYERBODY,
+//				GameConstants.MASKBITS_PLAYERBODY, (short) 0);
+//		pFixtureDef2.shape = mPoly2;
+//		Fixture mPlayerbodyf = body.createFixture(pFixtureDef2);
+//		mPlayerbodyf.setUserData("playerbody");
+//		mPoly2.dispose();
+//
+//		final PolygonShape mPoly = new PolygonShape();
+//		mPoly.setAsBox(.3f, .1f, new Vector2(0, .5f), 0);
+//		final FixtureDef pFixtureDef = PhysicsFactory.createFixtureDef(0f, 0f,
+//				0f, true, GameConstants.CATEGORYBIT_PLAYER,
+//				GameConstants.MASKBITS_PLAYER, (short) 0);
+//		pFixtureDef.shape = mPoly;
+//		Fixture mFeet = body.createFixture(pFixtureDef);
+//		mFeet.setUserData("playerFeet");
+//
+//		mPoly.dispose();
+		
 		final PolygonShape mPoly2 = new PolygonShape();
-		mPoly2.setAsBox(8f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-				15f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT, new Vector2(
-						0, -.09f), 0);
+		mPoly2.setAsBox(16f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+				30f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT, new Vector2(
+						0, -.18f), 0);
 		final FixtureDef pFixtureDef2 = PhysicsFactory.createFixtureDef(0f, 0f,
 				0f, true, GameConstants.CATEGORYBIT_PLAYERBODY,
 				GameConstants.MASKBITS_PLAYERBODY, (short) 0);
@@ -62,7 +86,7 @@ public abstract class Player extends AnimatedSprite {
 		mPoly2.dispose();
 
 		final PolygonShape mPoly = new PolygonShape();
-		mPoly.setAsBox(.3f, .1f, new Vector2(0, .5f), 0);
+		mPoly.setAsBox(.6f, .2f, new Vector2(0, 1f), 0);
 		final FixtureDef pFixtureDef = PhysicsFactory.createFixtureDef(0f, 0f,
 				0f, true, GameConstants.CATEGORYBIT_PLAYER,
 				GameConstants.MASKBITS_PLAYER, (short) 0);
@@ -100,7 +124,7 @@ public abstract class Player extends AnimatedSprite {
 
 			lastdirection = to;
 
-			this.animate(new long[] { 200, 200, 200 }, 7, 9, true);
+			this.animate(new long[] { 200, 200, 200 }, 6, 8, true);
 
 			body.setLinearVelocity(-1 * GameConstants.PLAYER_VELOCITY, 0);
 
@@ -128,17 +152,19 @@ public abstract class Player extends AnimatedSprite {
 
 	public void jump() {
 
+		System.out.println("Trying to Jump. "+footContacts);
 		if (this.footContacts > 0) {
 			ResourcesManager.getInstance().jumpSound.play();
 			this.isJumping = true;
 			if (lastdirection == Action.MOVELEFT) {
-				this.animate(new long[] { 100 }, new int[] { 11 });
+				this.animate(new long[] { 100 }, new int[] { 9});//11
 
 			} else if (lastdirection == Action.MOVERIGHT) {
 
-				this.animate(new long[] { 100 }, new int[] { 5 });
+				this.animate(new long[] { 100 }, new int[] { 4 });//5
 			}
 
+			System.out.println("Jump man");
 			body.setLinearVelocity(body.getLinearVelocity().x, -9);
 
 		}
@@ -150,7 +176,7 @@ public abstract class Player extends AnimatedSprite {
 		if (footContacts > 0 && this.isJumping) {
 			if (this.isMoving) {
 				if (lastdirection == Action.MOVELEFT) {
-					this.animate(new long[] { 200, 200, 200 }, 7, 9, true);
+					this.animate(new long[] { 200, 200, 200 }, 6, 8, true);
 
 				} else if (lastdirection == Action.MOVERIGHT) {
 
@@ -160,7 +186,7 @@ public abstract class Player extends AnimatedSprite {
 			} else {
 
 				if (lastdirection == Action.MOVELEFT) {
-					this.stopAnimation(6);
+					this.stopAnimation(0);
 
 				} else if (lastdirection == Action.MOVERIGHT) {
 
