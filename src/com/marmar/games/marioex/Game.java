@@ -55,6 +55,8 @@ public class Game extends SimpleBaseGameActivity {
 	@Override
 	public Scene onCreateScene() {
 		
+//		SceneManager.getInstance().setScene(SceneManager.getInstance().createSplashScene("andengine"));
+		
 		mEngine.registerUpdateHandler(new TimerHandler(2f, new ITimerCallback() 
 		{
             public void onTimePassed(final TimerHandler pTimerHandler) 

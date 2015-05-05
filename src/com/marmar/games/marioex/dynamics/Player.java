@@ -74,9 +74,9 @@ public abstract class Player extends AnimatedSprite {
 //		mPoly.dispose();
 		
 		final PolygonShape mPoly2 = new PolygonShape();
-		mPoly2.setAsBox(16f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT,
-				30f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT, new Vector2(
-						0, -.18f), 0);
+		mPoly2.setAsBox(15f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT,
+				28f / GameConstants.PIXEL_TO_METER_RATIO_DEFAULT, new Vector2(
+						0, -.169f), 0);
 		final FixtureDef pFixtureDef2 = PhysicsFactory.createFixtureDef(0f, 0f,
 				0f, true, GameConstants.CATEGORYBIT_PLAYERBODY,
 				GameConstants.MASKBITS_PLAYERBODY, (short) 0);
@@ -86,7 +86,7 @@ public abstract class Player extends AnimatedSprite {
 		mPoly2.dispose();
 
 		final PolygonShape mPoly = new PolygonShape();
-		mPoly.setAsBox(.6f, .2f, new Vector2(0, 1f), 0);
+		mPoly.setAsBox(.565f, .188f, new Vector2(0, .94f), 0);
 		final FixtureDef pFixtureDef = PhysicsFactory.createFixtureDef(0f, 0f,
 				0f, true, GameConstants.CATEGORYBIT_PLAYER,
 				GameConstants.MASKBITS_PLAYER, (short) 0);
@@ -124,9 +124,9 @@ public abstract class Player extends AnimatedSprite {
 
 			lastdirection = to;
 
-			this.animate(new long[] { 200, 200, 200 }, 6, 8, true);
+			this.animate(new long[] { 200, 200, 200, 200, 200, 200, 200, 200 }, 11, 18, true);
 
-			body.setLinearVelocity(-1 * GameConstants.PLAYER_VELOCITY, 0);
+			body.setLinearVelocity(-2 * GameConstants.PLAYER_VELOCITY, 0);
 
 		} else if (to == Action.MOVERIGHT) {
 
@@ -134,15 +134,16 @@ public abstract class Player extends AnimatedSprite {
 
 			lastdirection = to;
 
-			this.animate(new long[] { 200, 200, 200 }, 1, 3, true);
+			this.animate(new long[] { 200, 200, 200, 200, 200, 200, 200, 200 }, 1, 8, true);
 
-			body.setLinearVelocity(1 * GameConstants.PLAYER_VELOCITY, 0);
+			body.setLinearVelocity(2 * GameConstants.PLAYER_VELOCITY, 0);
+			
 		} else if (to == Action.STOP) {
 			this.isMoving = false;
 			body.setLinearVelocity(0, 0);
 
 			if (lastdirection == Action.MOVELEFT) {
-				this.stopAnimation(6);
+				this.stopAnimation(10);
 			} else if (lastdirection == Action.MOVERIGHT) {
 				this.stopAnimation(0);
 			}
@@ -157,11 +158,11 @@ public abstract class Player extends AnimatedSprite {
 			ResourcesManager.getInstance().jumpSound.play();
 			this.isJumping = true;
 			if (lastdirection == Action.MOVELEFT) {
-				this.animate(new long[] { 100 }, new int[] { 9});//11
+				this.animate(new long[] { 100 }, new int[] { 19});//11
 
 			} else if (lastdirection == Action.MOVERIGHT) {
 
-				this.animate(new long[] { 100 }, new int[] { 4 });//5
+				this.animate(new long[] { 100 }, new int[] { 9 });//5
 			}
 
 			System.out.println("Jump man");
@@ -176,11 +177,13 @@ public abstract class Player extends AnimatedSprite {
 		if (footContacts > 0 && this.isJumping) {
 			if (this.isMoving) {
 				if (lastdirection == Action.MOVELEFT) {
-					this.animate(new long[] { 200, 200, 200 }, 6, 8, true);
+					//this.animate(new long[] { 200, 200, 200 }, 6, 8, true);
+					this.animate(new long[] { 200, 200, 200, 200, 200, 200, 200, 200 }, 11, 18, true);
 
 				} else if (lastdirection == Action.MOVERIGHT) {
 
-					this.animate(new long[] { 200, 200, 200 }, 1, 3, true);
+					//this.animate(new long[] { 200, 200, 200 }, 1, 3, true);
+					this.animate(new long[] { 200, 200, 200, 200, 200, 200, 200, 200 }, 1, 8, true);
 				}
 
 			} else {

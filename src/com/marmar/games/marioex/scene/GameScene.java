@@ -4,10 +4,7 @@ import org.andengine.engine.camera.hud.HUD;
 import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
-import org.andengine.entity.Entity;
-import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.LoopEntityModifier;
-import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.modifier.ScaleModifier;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.background.Background;
@@ -57,19 +54,25 @@ public class GameScene extends BaseScene {
 	private HUD gameHUD;
 	private PhysicsWorld physicsWorld;
 	private boolean stopManagedUpdate = false;
+	public static String levelName;
+
+	public GameScene(String levelName) {
+		this.levelName = levelName;
+		System.out.println(levelName +" parameter \n objets="+this.levelName);
+	}
 
 	@Override
 	public void createScene() {
 		createBackground();
 		createHUD();
 		createPhysics();
-		loadLevel(1);
+		loadLevel();
 
-		// attachChild(new DebugRenderer(physicsWorld,vbom));
+//		 attachChild(new DebugRenderer(physicsWorld,vbom));
 
 	}
 
-	private void loadLevel(int j) {
+	private void loadLevel() {
 		try {
 			TMXLoader tmxLoader = new TMXLoader(
 					ResourcesManager.getInstance().activity.getAssets(),
@@ -89,14 +92,24 @@ public class GameScene extends BaseScene {
 			// this.mTMXTiledMap = tmxLoader.loadFromAsset("worlds/world" + j +
 			// ".tmx");
 			// miTest
-			this.mTMXTiledMap = tmxLoader.loadFromAsset("worlds/test5.tmx");
+			// test5
+			// MarioTest
+			// this.mTMXTiledMap = tmxLoader.loadFromAsset("worlds/test5.tmx");
+			System.out.println(levelName +" createScene");
+			if (levelName != null) {
+				this.mTMXTiledMap = tmxLoader.loadFromAsset("worlds/" + levelName);
+			} else {
+				this.mTMXTiledMap = tmxLoader.loadFromAsset("worlds/test5.tmx");
+				System.out.println("error ln is null again");
+			}
 
 		} catch (Exception e) {
 			System.out.println("Error!!!: " + e);
 			Debug.e(e);
 		}
-		
-		final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(0, 0.01f, 0.5f);
+
+		final FixtureDef FIXTURE_DEF = PhysicsFactory.createFixtureDef(0,
+				0.01f, 0.5f);
 
 		for (int i = 0; i < this.mTMXTiledMap.getTMXLayers().size(); i++) {
 			TMXLayer layer = this.mTMXTiledMap.getTMXLayers().get(i);
@@ -164,71 +177,85 @@ public class GameScene extends BaseScene {
 					rect2.registerUpdateHandler(physicsHandler2);
 
 					attachChild(rect2);
-				}else if (group.getName().equals("platform1")) {
-					
-					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.platform1_region, vbom);
-					PhysicsFactory.createBoxBody(physicsWorld, levelObject, BodyType.StaticBody, FIXTURE_DEF).setUserData("platform1");
+				} else if (group.getName().equals("platform1")) {
+
+					Sprite levelObject = new Sprite(object.getX(),
+							object.getY(), resourcesManager.platform1_region,
+							vbom);
+					PhysicsFactory.createBoxBody(physicsWorld, levelObject,
+							BodyType.StaticBody, FIXTURE_DEF).setUserData(
+							"platform1");
 					attachChild(levelObject);
-				}else if (group.getName().equals("platform2")) {
-					
-					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.platform2_region, vbom);
-					final Body body = PhysicsFactory.createBoxBody(physicsWorld, levelObject, BodyType.StaticBody, FIXTURE_DEF);
+				} else if (group.getName().equals("platform2")) {
+
+					Sprite levelObject = new Sprite(object.getX(),
+							object.getY(), resourcesManager.platform2_region,
+							vbom);
+					final Body body = PhysicsFactory.createBoxBody(
+							physicsWorld, levelObject, BodyType.StaticBody,
+							FIXTURE_DEF);
 					body.setUserData("platform2");
-					physicsWorld.registerPhysicsConnector(new PhysicsConnector(levelObject, body, true, false));
+					physicsWorld.registerPhysicsConnector(new PhysicsConnector(
+							levelObject, body, true, false));
 					attachChild(levelObject);
-				}else if (group.getName().equals("platform3")) {
-					
-					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.platform3_region, vbom);
-					final Body body = PhysicsFactory.createBoxBody(physicsWorld, levelObject, BodyType.StaticBody, FIXTURE_DEF);
+				} else if (group.getName().equals("platform3")) {
+
+					Sprite levelObject = new Sprite(object.getX(),
+							object.getY(), resourcesManager.platform3_region,
+							vbom);
+					final Body body = PhysicsFactory.createBoxBody(
+							physicsWorld, levelObject, BodyType.StaticBody,
+							FIXTURE_DEF);
 					body.setUserData("platform3");
-					physicsWorld.registerPhysicsConnector(new PhysicsConnector(levelObject, body, true, false));
+					physicsWorld.registerPhysicsConnector(new PhysicsConnector(
+							levelObject, body, true, false));
 					attachChild(levelObject);
-				}else if (group.getName().equals("coin")) {
-					
-					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.coin_region, vbom)
-					{
+				} else if (group.getName().equals("coin")) {
+
+					Sprite levelObject = new Sprite(object.getX(),
+							object.getY(), resourcesManager.coin_region, vbom) {
 						@Override
-						protected void onManagedUpdate(float pSecondsElapsed) 
-						{
+						protected void onManagedUpdate(float pSecondsElapsed) {
 							super.onManagedUpdate(pSecondsElapsed);
 
-							if (player.collidesWith(this))
-							{
-//								addToScore(10);
-//								TODO
+							if (player.collidesWith(this)) {
+								// addToScore(10);
+								// TODO
 								this.setVisible(false);
 								this.setIgnoreUpdate(true);
 							}
 						}
 					};
-					levelObject.registerEntityModifier(new LoopEntityModifier(new ScaleModifier(1, 1, 1.3f)));
+					levelObject.registerEntityModifier(new LoopEntityModifier(
+							new ScaleModifier(1, 1, 1.3f)));
 					attachChild(levelObject);
-				}else if (group.getName().equals("platform3")) {
-					
-					Sprite levelObject = new Sprite(object.getX(), object.getY(), resourcesManager.complete_stars_region, vbom)
-					{
+				} else if (group.getName().equals("platform3")) {
+
+					Sprite levelObject = new Sprite(object.getX(),
+							object.getY(),
+							resourcesManager.complete_stars_region, vbom) {
 						@Override
-						protected void onManagedUpdate(float pSecondsElapsed) 
-						{
+						protected void onManagedUpdate(float pSecondsElapsed) {
 							super.onManagedUpdate(pSecondsElapsed);
 
-							if (player.collidesWith(this))
-							{
-//								levelCompleteWindow.display(StarsCount.TWO, GameScene.this, camera);
-//								TODO
+							if (player.collidesWith(this)) {
+								// levelCompleteWindow.display(StarsCount.TWO,
+								// GameScene.this, camera);
+								// TODO
 								this.setVisible(false);
 								this.setIgnoreUpdate(true);
 							}
 						}
 					};
-					levelObject.registerEntityModifier(new LoopEntityModifier(new ScaleModifier(1, 1, 1.3f)));
+					levelObject.registerEntityModifier(new LoopEntityModifier(
+							new ScaleModifier(1, 1, 1.3f)));
 					attachChild(levelObject);
 				}
-				
+
 			}
 		}
 
-		player = new Player(200, 200, vbom, camera, physicsWorld) {//200 400
+		player = new Player(200, 200, vbom, camera, physicsWorld) {// 200 400
 			@Override
 			public void onDie() {
 
@@ -395,7 +422,10 @@ public class GameScene extends BaseScene {
 
 	@Override
 	public void onBackKeyPressed() {
-		SceneManager.getInstance().loadMenuScene(engine);
+		// TODO
+		// when the back is pressed it's supposed to show the options scene
+		// SceneManager.getInstance().loadMenuScene(engine);
+		SceneManager.getInstance().loadLevelSelector(engine);
 	}
 
 	@Override
@@ -422,28 +452,29 @@ public class GameScene extends BaseScene {
 				final Fixture x1 = contact.getFixtureA();
 				final Fixture x2 = contact.getFixtureB();
 
-				if (x1.getBody().getUserData() != null && x2.getBody().getUserData() != null)
-				{
-					
-					if (x1.getBody().getUserData().equals("platform2") && x2.getBody().getUserData().equals("playerFeet"))
-					{
-						engine.registerUpdateHandler(new TimerHandler(0.2f, new ITimerCallback()
-						{									
-						    public void onTimePassed(final TimerHandler pTimerHandler)
-						    {
-						    	pTimerHandler.reset();
-						    	engine.unregisterUpdateHandler(pTimerHandler);
-						    	x1.getBody().setType(BodyType.DynamicBody);
-						    }
-						}));
+				if (x1.getBody().getUserData() != null
+						&& x2.getBody().getUserData() != null) {
+
+					if (x1.getBody().getUserData().equals("platform2")
+							&& x2.getBody().getUserData().equals("playerFeet")) {
+						engine.registerUpdateHandler(new TimerHandler(0.2f,
+								new ITimerCallback() {
+									public void onTimePassed(
+											final TimerHandler pTimerHandler) {
+										pTimerHandler.reset();
+										engine.unregisterUpdateHandler(pTimerHandler);
+										x1.getBody().setType(
+												BodyType.DynamicBody);
+									}
+								}));
 					}
-					
-					if (x1.getBody().getUserData().equals("platform3") && x2.getBody().getUserData().equals("playerFeet"))
-					{
+
+					if (x1.getBody().getUserData().equals("platform3")
+							&& x2.getBody().getUserData().equals("playerFeet")) {
 						x1.getBody().setType(BodyType.DynamicBody);
 					}
 				}
-				
+
 				if (x2.getUserData() != null) {
 
 					if (x2.getUserData().toString() == "playerFeet") {
@@ -531,40 +562,40 @@ public class GameScene extends BaseScene {
 		return contactListener;
 	}
 
-	@Override
-	public void onManagedUpdate(final float pSecondsElapsed) {
-		super.onManagedUpdate(pSecondsElapsed);
-		if (this.stopManagedUpdate)
-			return;
-		physicsWorld.onUpdate(pSecondsElapsed);
-		Entity e = new Entity();
-
-		int tilemapheight = this.mTMXTiledMap.getTileHeight()
-				* this.mTMXTiledMap.getTileRows(), mapW = this.mTMXTiledMap
-				.getTileWidth() * this.mTMXTiledMap.getTileColumns();
-
-		float y = (tilemapheight - (GameConstants.CAMERA_HEIGHT / 2));
-
-		if (player.getX() > (GameConstants.CAMERA_WIDTH / 2)
-				&& player.getX() < (mapW - GameConstants.CAMERA_WIDTH / 2))
-			e.setPosition(player.getX(), y);
-		else if (player.getX() < (GameConstants.CAMERA_WIDTH / 2))
-			e.setPosition((GameConstants.CAMERA_WIDTH / 2), y);
-		else if (player.getX() > (mapW - GameConstants.CAMERA_WIDTH / 2))
-			e.setPosition((mapW - GameConstants.CAMERA_WIDTH / 2), y);
-
-		camera.setChaseEntity(e);
-
-		final MoveModifier modifier = new MoveModifier(30, e.getX(),
-				player.getX(), e.getY(), y) {
-			@Override
-			protected void onModifierFinished(IEntity pItem) {
-				super.onModifierFinished(pItem);
-				camera.setChaseEntity(null);
-			}
-		};
-
-		e.registerEntityModifier(modifier);
-	}
+	// @Override
+	// public void onManagedUpdate(final float pSecondsElapsed) {
+	// super.onManagedUpdate(pSecondsElapsed);
+	// if (this.stopManagedUpdate)
+	// return;
+	// physicsWorld.onUpdate(pSecondsElapsed);
+	// Entity e = new Entity();
+	//
+	// int tilemapheight = this.mTMXTiledMap.getTileHeight()
+	// * this.mTMXTiledMap.getTileRows(), mapW = this.mTMXTiledMap
+	// .getTileWidth() * this.mTMXTiledMap.getTileColumns();
+	//
+	// float y = (tilemapheight - (GameConstants.CAMERA_HEIGHT / 2));
+	//
+	// if (player.getX() > (GameConstants.CAMERA_WIDTH / 2)
+	// && player.getX() < (mapW - GameConstants.CAMERA_WIDTH / 2))
+	// e.setPosition(player.getX(), y);
+	// else if (player.getX() < (GameConstants.CAMERA_WIDTH / 2))
+	// e.setPosition((GameConstants.CAMERA_WIDTH / 2), y);
+	// else if (player.getX() > (mapW - GameConstants.CAMERA_WIDTH / 2))
+	// e.setPosition((mapW - GameConstants.CAMERA_WIDTH / 2), y);
+	//
+	// camera.setChaseEntity(e);
+	//
+	// final MoveModifier modifier = new MoveModifier(30, e.getX(),
+	// player.getX(), e.getY(), y) {
+	// @Override
+	// protected void onModifierFinished(IEntity pItem) {
+	// super.onModifierFinished(pItem);
+	// camera.setChaseEntity(null);
+	// }
+	// };
+	//
+	// e.registerEntityModifier(modifier);
+	// }
 
 }

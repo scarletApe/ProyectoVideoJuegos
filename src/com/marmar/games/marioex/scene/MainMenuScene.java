@@ -54,7 +54,8 @@ public class MainMenuScene extends BaseScene implements
 		switch (pMenuItem.getID()) {
 		case MENU_PLAY:
 			// Load Game Scene!
-			SceneManager.getInstance().loadGameScene(engine);
+//			SceneManager.getInstance().loadGameScene(engine);
+			SceneManager.getInstance().loadLevelSelector(engine);
 			return true;
 		default:
 			return false;
@@ -92,7 +93,7 @@ public class MainMenuScene extends BaseScene implements
 		menuChildScene.buildAnimations();
 		menuChildScene.setBackgroundEnabled(false);
 
-		playMenuItem.setPosition(playMenuItem.getX()-90, playMenuItem.getY());
+		playMenuItem.setPosition(playMenuItem.getX(), playMenuItem.getY()+20);
 
 		menuChildScene.setOnMenuItemClickListener(this);
 
